@@ -148,8 +148,15 @@ func (m *cache) cacheable(r *http.Request, w http.ResponseWriter, status int) (t
 	return expiry, true
 }
 
-func cacheKey(r *http.Request) string {
-	return r.Method + r.Host + r.URL.Path
+func (m *cache) cacheKey(r *http.Request) string {
+	key := r.Method + r.Host + r.URL.Path
+
+	// Include the Range header if it's present
+	if rangeHeader := r.Header.Get("Range"); rangeHeader != "" {
+		key += rangeHeader
+	}
+
+	return key
 }
 
 type responseWriter struct {
